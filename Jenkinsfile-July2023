@@ -1,21 +1,21 @@
 node{
   def mavenHome = tool name: 'maven3.8.2'
-  stage('1Clone'){
+  stage('1.Clone'){
     git 'https://github.com/LandmakTechnology/maven-web-application'
   }
-  stage('2Test+build'){
+  stage('2.Test+build'){
     sh "${mavenHome}/bin/mvn clean package"
   }
-  stage('SonarQube'){
+  stage('3.CodeAnalysis'){
     sh "${mavenHome}/bin/mvn sonar:sonar"
   }
-  stage('4UploadArtifacts'){
+  stage('4.UploadArtifacts'){
     sh "${mavenHome}/bin/mvn deploy"
   }
-  stage('5Deploy'){
+  stage('5.Deploy'){
     deploy adapters: [tomcat9(credentialsId: 'funke', path: '', url: 'http://18.118.141.60:8080/')], contextPath: null, war: 'target/*war'
   }
-  stage('6Notification'){
+  stage('6.Notification'){
     emailext body: '''Hi Team,
 Build status
 Funke''', recipientProviders: [developers(), contributor()], subject: 'build status', to: 'developers'
